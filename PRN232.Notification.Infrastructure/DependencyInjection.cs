@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
 namespace PRN232.Notification.Infrastructure;
@@ -9,7 +9,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Register infrastructure services (e.g. DbContext, Repositories) here
+        services.AddHostedService<Messaging.NotificationIntegrationConsumer>();
         return services;
     }
 }
