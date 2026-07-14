@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232.Notification.Grpc";
+
+package notification;
+
+service NotificationGrpcService {
+  rpc SendNotification (SendNotificationRequest) returns (SendNotificationReply);
+}
+
+message SendNotificationRequest {
+  string lecturerId = 1;
+  string roomId = 2;
+  string examId = 3;
+  string submissionId = 4;
+  string type = 5;
+  string title = 6;
+  string message = 7;
+}
+
+message SendNotificationReply {
+  bool success = 1;
+  string message = 2;
+}

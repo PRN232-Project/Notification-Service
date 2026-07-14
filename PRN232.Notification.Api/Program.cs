@@ -1,4 +1,5 @@
 using PRN232.Notification.Application;
+using PRN232.Notification.Api.Services;
 using PRN232.Notification.Infrastructure;
 using PRN232.Notification.Infrastructure.SignalR;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add controllers and SignalR support
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddGrpc();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -40,5 +42,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<GradingHub>("/gradingHub");
+app.MapGrpcService<NotificationGrpcEndpoint>();
 
 app.Run();
