@@ -17,7 +17,7 @@ public class NotificationIntegrationConsumer : BackgroundService
 {
     private readonly IHubContext<GradingHub> _hubContext;
     private readonly ILogger<NotificationIntegrationConsumer> _logger;
-    private readonly string _hostName;
+    private readonly IConfiguration _configuration;
 
     public NotificationIntegrationConsumer(
         IHubContext<GradingHub> hubContext,
@@ -26,20 +26,29 @@ public class NotificationIntegrationConsumer : BackgroundService
     {
         _hubContext = hubContext;
         _logger = logger;
-        _hostName = configuration["RabbitMQ:HostName"] 
-                    ?? Environment.GetEnvironmentVariable("RABBITMQ_HOST") 
-                    ?? "localhost";
+        _configuration = configuration;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("--> Notification Integration Consumer starting...");
+        if (!_configuration.GetValue("RabbitMQ:Enabled", true))
+        {
+            _logger.LogInformation("--> RabbitMQ consumer is disabled by configuration.");
+            return;
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var factory = new ConnectionFactory { HostName = _hostName };
+                var factory = new ConnectionFactory
+                {
+                    HostName = _configuration["RabbitMQ:HostName"] ?? Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost",
+                    Port = _configuration.GetValue("RabbitMQ:Port", 5672),
+                    UserName = _configuration["RabbitMQ:UserName"] ?? "guest",
+                    Password = _configuration["RabbitMQ:Password"] ?? "guest"
+                };
                 using var connection = await factory.CreateConnectionAsync(stoppingToken);
                 using var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
 
